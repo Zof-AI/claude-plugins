@@ -1,0 +1,15 @@
+{
+  "name": "zof",
+  "description": "Zof for coding agents: ask Zof whether a change may ship, and why it is blocked, from Claude Code.",
+  "owner": {
+    "name": "Zof AI",
+    "url": "https://zof.ai"
+  },
+  "plugins": [
+    {
+      "name": "zof",
+      "source": "./plugins/zof",
+      "description": "Connects Claude Code to your company's Zof: release decisions, blocking reasons, missing evidence, test runs and policy, read-only."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "zof": {
+      "type": "http",
+      "url": "${ZOF_MCP_URL:-https://mcp.zof.ai/mcp}"
+    }
+  }
+}

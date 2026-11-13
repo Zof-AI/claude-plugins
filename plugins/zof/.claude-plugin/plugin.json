@@ -1,0 +1,24 @@
+{
+  "name": "zof",
+  "displayName": "Zof",
+  "version": "0.1.0",
+  "description": "Zof for coding agents: whether a pull request may ship, why it is blocked, what evidence is missing, and your test runs, from your company's Zof. Read-only; sign in with your Zof account.",
+  "author": {
+    "name": "Zof AI",
+    "url": "https://zof.ai"
+  },
+  "homepage": "https://console.zof.ai/help",
+  "repository": "https://github.com/Zof-AI/claude-plugins",
+  "keywords": [
+    "release",
+    "policy",
+    "verification",
+    "pull-request",
+    "mcp"
+  ],
+  "icon": "./.claude-plugin/icon.png",
+  "documentationUrl": "https://console.zof.ai/help",
+  "supportUrl": "https://zof.ai/contact",
+  "privacyPolicyUrl": "https://zof.ai/legal/privacy",
+  "termsOfServiceUrl": "https://zof.ai/legal/terms"
+}
