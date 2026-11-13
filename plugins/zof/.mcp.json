@@ -2,7 +2,7 @@
   "mcpServers": {
     "zof": {
       "type": "http",
-      "url": "${ZOF_MCP_URL:-https://mcp.zof.ai/mcp}"
+      "url": "${ZOF_MCP_URL:-https://console.zof.ai/api/mcp}"
     }
   }
 }

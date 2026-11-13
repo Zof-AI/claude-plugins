@@ -20,5 +20,6 @@
   "documentationUrl": "https://console.zof.ai/help",
   "supportUrl": "https://zof.ai/contact",
   "privacyPolicyUrl": "https://zof.ai/legal/privacy",
-  "termsOfServiceUrl": "https://zof.ai/legal/terms"
+  "termsOfServiceUrl": "https://zof.ai/legal/terms",
+  "license": "MIT"
 }

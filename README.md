@@ -38,11 +38,11 @@ A `ship` answer is advice. The **Zof / Control** check on the pull request still
 
 ## Server address
 
-The plugin connects to `https://mcp.zof.ai/mcp`. To use another address, set `ZOF_MCP_URL` before you start Claude
-Code. For example, to use the console address `https://console.zof.ai/api/mcp`:
+The plugin connects to `https://console.zof.ai/api/mcp`. To use another address, set `ZOF_MCP_URL` before you start Claude
+Code. For example, to use the short address `https://mcp.zof.ai/mcp` once it is live:
 
 ```
-export ZOF_MCP_URL=https://console.zof.ai/api/mcp
+export ZOF_MCP_URL=https://mcp.zof.ai/mcp
 ```
 
 Both addresses are the same server, and a sign-in on one works on the other.
@@ -53,7 +53,7 @@ A company admin can create a read-only agent token in Zof (Settings, Connected t
 as a header instead of the plugin's sign-in:
 
 ```
-claude mcp add --transport http zof https://mcp.zof.ai/mcp --header "Authorization: Bearer $ZOF_AGENT_TOKEN"
+claude mcp add --transport http zof https://console.zof.ai/api/mcp --header "Authorization: Bearer $ZOF_AGENT_TOKEN"
 ```
 
 Keep the token in your CI's secret store, never in a file in the repository.
