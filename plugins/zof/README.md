@@ -1,6 +1,6 @@
 # zof
 
-Connects Claude Code to your company's Zof through the hosted Zof MCP server at `https://console.zof.ai/api/mcp`. You can ask
+Connects Claude Code to your company's Zof through the hosted Zof MCP server at `https://mcp.zof.ai/mcp`. You can ask
 whether a pull request may ship, why Zof blocks it, what evidence is missing, and how its test runs went. Every tool is
 read-only. You sign in with your own Zof account (`/mcp`, then **zof**, then **Authenticate**), and the connection only
 sees the company you pick.
