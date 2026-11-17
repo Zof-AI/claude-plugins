@@ -1,0 +1,11 @@
+## Zof: check before you push
+
+Zof is this repository's release policy check. It decides at the pull request whether a change may merge.
+
+- Before you run `git push`, `gh pr create` or open a pull request, call the Zof MCP tool `zof_check_change` for
+  this repository and the current commit. For a pull request that is already open, call `zof_get_release_decision`.
+- Tell the user what Zof says is required, what evidence is already there and what is missing. Use Zof's words; do
+  not guess the policy.
+- This is advice only. Zof does not block the push; the **Zof / Control** check on the pull request still enforces
+  the merge.
+- If the Zof tools are not connected or not signed in, say so in one line and continue.
