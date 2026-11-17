@@ -1,9 +1,12 @@
 #!/bin/sh
 # Installs (or with --uninstall removes) Zof's warn-only git pre-push reminder in the current repository.
-# An existing pre-push hook is kept as pre-push.zof-backup and still runs after the reminder.
+# It only fills an empty pre-push slot and never renames, moves or edits a hook it did not write.
 set -eu
 
-marker='zof-push-check'
+marker='# zof-push-check v1 (managed)'
+# Hooks run at the top level, so the common git dir resolves there; a missing script is skipped, never a failure.
+# shellcheck disable=SC2016 # expanded later, inside the user's hook
+call_line='f="$(git rev-parse --git-common-dir)/zof/push-reminder.sh"; [ ! -f "$f" ] || sh "$f"'
 
 usage() {
   printf 'Usage: install-git-hook.sh [--uninstall]\n'
@@ -28,60 +31,75 @@ dir=$(git rev-parse --git-path hooks)
 # shellcheck disable=SC2088 # matches a literal ~ that git left unexpanded
 case "$dir" in "~/"*) dir="$HOME/${dir#\~/}" ;; esac
 hook="$dir/pre-push"
-backup="$hook.zof-backup"
+zdir="$(git rev-parse --git-common-dir)/zof"
+script="$zdir/push-reminder.sh"
 
-is_ours() { [ -f "$1" ] && grep -q "$marker" "$1" 2>/dev/null; }
+is_ours() { [ -f "$1" ] && grep -qxF "$marker" "$1" 2>/dev/null; }
 
 if [ "$mode" = uninstall ]; then
   if is_ours "$hook"; then
     rm -f "$hook"
-    if [ -e "$backup" ] || [ -L "$backup" ]; then
-      mv "$backup" "$hook"
-      printf 'zof: removed the reminder and restored your previous pre-push hook (%s).\n' "$hook"
-    else
-      printf 'zof: removed the reminder (%s).\n' "$hook"
-    fi
-  else
-    printf 'zof: no Zof reminder installed at %s; nothing changed.\n' "$hook"
+    printf 'zof: removed the reminder hook (%s).\n' "$hook"
+  elif [ -e "$hook" ] || [ -L "$hook" ]; then
+    printf 'zof: %s is not Zof'"'"'s, so it was left alone; remove any Zof line from it yourself.\n' "$hook"
+  fi
+  if is_ours "$script"; then
+    rm -f "$script"
+    rmdir "$zdir" 2>/dev/null || :
+    printf 'zof: removed %s.\n' "$script"
   fi
   exit 0
 fi
 
-mkdir -p "$dir"
-if [ -e "$hook" ] || [ -L "$hook" ]; then
-  if ! is_ours "$hook"; then
-    if [ -e "$backup" ] || [ -L "$backup" ]; then
-      printf 'zof: %s already exists; move it aside and run again. Nothing changed.\n' "$backup" >&2
-      exit 1
-    fi
-    mv "$hook" "$backup"
-    printf 'zof: kept your existing pre-push hook as %s; it still runs after the reminder.\n' "$backup"
-  fi
-fi
-
-tmp="$hook.zof-tmp.$$"
-cat >"$tmp" <<'HOOK'
+write_reminder() {
+  tmp="$1.zof-tmp.$$"
+  cat >"$tmp" <<'HOOK'
 #!/bin/sh
-# zof-push-check: warn-only Zof reminder; never blocks a push and makes no network calls.
-# Turn it off with ZOF_PUSH_CHECK=off. Remove it with: install-git-hook.sh --uninstall
-case "${ZOF_PUSH_CHECK:-}" in
-  off | OFF | 0 | false | no) ;;
-  *)
-    {
-      printf 'zof: Zof checks this change at the pull request.\n'
-      printf 'zof: To know first, ask your coding agent "will this ship?" (Zof MCP tool zof_check_change),\n'
-      printf 'zof: or open https://console.zof.ai\n'
-      printf 'zof: Set ZOF_PUSH_CHECK=off to hide this reminder.\n'
-    } >&2 2>/dev/null || :
-    ;;
-esac
-# Chain to the hook that was here before Zof's, with the same arguments and stdin; its answer decides the push.
-prev="$(dirname "$0")/pre-push.zof-backup"
-if [ -x "$prev" ]; then
-  exec "$prev" "$@"
-fi
+# zof-push-check v1 (managed)
+# Warn-only Zof reminder: never blocks a push, no network calls. Turn it off with ZOF_PUSH_CHECK=off.
+case "${ZOF_PUSH_CHECK:-}" in off | OFF | 0 | false | no) exit 0 ;; esac
+{
+  printf 'zof: Zof checks this change at the pull request.\n'
+  printf 'zof: To know first, ask your coding agent "will this ship?" (Zof MCP tool zof_check_change),\n'
+  printf 'zof: or open https://console.zof.ai\n'
+  printf 'zof: Set ZOF_PUSH_CHECK=off to hide this reminder.\n'
+} >&2 2>/dev/null || :
 exit 0
 HOOK
-chmod +x "$tmp"
-mv "$tmp" "$hook"
+  chmod +x "$tmp"
+  mv "$tmp" "$1"
+}
+
+# Refusing still writes our own reminder script under the git dir, so the printed line works at once.
+refuse() {
+  mkdir -p "$zdir"
+  write_reminder "$script"
+  printf 'zof: %s No hook was changed.\n' "$1" >&2
+  printf 'zof: %s\n\n%s\n\n' "$2" "$3" >&2
+  exit 1
+}
+
+hooks_path=$(git config --get core.hooksPath 2>/dev/null || :)
+case "$hooks_path" in
+  *.husky*) refuse "husky manages this repository's hooks." "Add this line to .husky/pre-push:" "$call_line" ;;
+esac
+for f in lefthook.yml lefthook.yaml .lefthook.yml .lefthook.yaml lefthook.json lefthook.toml \
+  .config/lefthook.yml .config/lefthook.yaml; do
+  if [ -f "$f" ]; then
+    refuse "lefthook manages this repository's hooks ($f)." \
+      "Add this command under pre-push: commands: in $f:" "zof: { run: '$call_line' }"
+  fi
+done
+if [ -f .pre-commit-config.yaml ]; then
+  q="'"
+  refuse "pre-commit manages this repository's hooks (.pre-commit-config.yaml)." \
+    "Add this entry under repos: in .pre-commit-config.yaml, then run pre-commit install -t pre-push:" \
+    "- {repo: local, hooks: [{id: zof-push-check, name: Zof push reminder, language: system, entry: ${q}sh -c ${q}${q}${call_line}${q}${q}${q}, stages: [pre-push], pass_filenames: false, always_run: true, verbose: true}]}"
+fi
+if { [ -e "$hook" ] || [ -L "$hook" ]; } && ! is_ours "$hook"; then
+  refuse "$hook already exists." "Add this line to it:" "$call_line"
+fi
+
+mkdir -p "$dir"
+write_reminder "$hook"
 printf 'zof: installed the push reminder at %s (turn off with ZOF_PUSH_CHECK=off; remove with --uninstall).\n' "$hook"
