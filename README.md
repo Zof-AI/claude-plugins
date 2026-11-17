@@ -38,22 +38,23 @@ A `ship` answer is advice. The **Zof / Control** check on the pull request still
 
 ## Use Zof with any coding agent
 
-The Zof MCP server works in any agent that speaks MCP. These add a reminder to check with Zof before a push, for every
-tool and for people at the terminal. Each is warn-only, makes no network calls and is turned off with
-`ZOF_PUSH_CHECK=off`.
+The Zof MCP server works in any agent that speaks MCP. These remind the agent, or the person at the terminal, to check
+with Zof before a push. None of them blocks anything or makes network calls.
 
-**Git (any tool, any person).** A `pre-push` hook prints a short reminder on every `git push` and never blocks it. It
-keeps any hook you already have and runs it after. Run inside your repository (respects `core.hooksPath`):
+**Git (any tool, any person).** A `pre-push` hook prints a short reminder on every `git push` and always lets it
+through. Run inside your repository (it respects `core.hooksPath`; the URL is pinned to a reviewed commit):
 
 ```
-curl -fsSL https://raw.githubusercontent.com/Zof-AI/claude-plugins/main/integrations/git/install-git-hook.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Zof-AI/claude-plugins/ccf47de93b3e4c59beae9510bd499cfdd9a52e5d/integrations/git/install-git-hook.sh | sh
 ```
 
-To remove it and restore your old hook, run the same command with `sh -s -- --uninstall`.
+It only installs where no `pre-push` hook exists. If you already have one, or use husky, lefthook or pre-commit, it
+changes nothing and prints one line to add to your own hook or config. Add `sh -s -- --uninstall` to remove it, and
+set `ZOF_PUSH_CHECK=off` to silence it.
 
-**Cursor.** Copy `integrations/cursor/hooks.json` to `.cursor/hooks.json` and `integrations/cursor/hooks/` to
-`.cursor/hooks/` in your repository. On `git push` and `gh pr create`/`merge` the hook allows the command and asks the
-agent to call `zof_check_change` first.
+**Cursor.** Copy `integrations/cursor/rules/zof.mdc` to `.cursor/rules/zof.mdc` in your repository. Before a push or a
+pull request, the agent asks Zof (`zof_check_change`) and tells you what is required or missing. Cursor also reads
+`AGENTS.md`, so the next item works there too.
 
 **Codex and other agents that read `AGENTS.md`.** Paste `integrations/codex/AGENTS.md` into your repository's
 `AGENTS.md`. It tells the agent to ask Zof (`zof_check_change`) before a push or a pull request and to report what is
