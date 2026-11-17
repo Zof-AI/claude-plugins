@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "sh .cursor/hooks/zof-push-check.sh",
+        "matcher": "git .*push|gh +pr +(create|merge)",
+        "timeout": 5
+      }
+    ]
+  }
+}

@@ -36,6 +36,29 @@ Claude also uses the Zof tools on its own when your question needs them. Every t
 
 A `ship` answer is advice. The **Zof / Control** check on the pull request still enforces the merge.
 
+## Use Zof with any coding agent
+
+The Zof MCP server works in any agent that speaks MCP. These add a reminder to check with Zof before a push, for every
+tool and for people at the terminal. Each is warn-only, makes no network calls and is turned off with
+`ZOF_PUSH_CHECK=off`.
+
+**Git (any tool, any person).** A `pre-push` hook prints a short reminder on every `git push` and never blocks it. It
+keeps any hook you already have and runs it after. Run inside your repository (respects `core.hooksPath`):
+
+```
+curl -fsSL https://raw.githubusercontent.com/Zof-AI/claude-plugins/main/integrations/git/install-git-hook.sh | sh
+```
+
+To remove it and restore your old hook, run the same command with `sh -s -- --uninstall`.
+
+**Cursor.** Copy `integrations/cursor/hooks.json` to `.cursor/hooks.json` and `integrations/cursor/hooks/` to
+`.cursor/hooks/` in your repository. On `git push` and `gh pr create`/`merge` the hook allows the command and asks the
+agent to call `zof_check_change` first.
+
+**Codex and other agents that read `AGENTS.md`.** Paste `integrations/codex/AGENTS.md` into your repository's
+`AGENTS.md`. It tells the agent to ask Zof (`zof_check_change`) before a push or a pull request and to report what is
+required or missing.
+
 ## Server address
 
 The plugin connects to `https://mcp.zof.ai/mcp`. To use another address, set `ZOF_MCP_URL` before you start Claude
