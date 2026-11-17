@@ -29,6 +29,7 @@ From a shell, the same steps are `claude plugin marketplace add Zof-AI/claude-pl
 
 Claude also uses the Zof tools on its own when your question needs them. Every tool is read-only:
 
+- `zof_check_change`: preview whether a change will ship (read-only, free; a preview, not a decision);
 - release: `zof_get_release_decision`, `zof_explain_block`, `zof_get_evidence_status`, `zof_list_decisions`,
   `zof_get_policy_requirements`, `zof_get_change_record`, `zof_replay_decision`;
 - console: `zof_list_runs`, `zof_get_run`, `zof_get_test_health`, `zof_list_schedules`, `zof_get_system_graph`,
