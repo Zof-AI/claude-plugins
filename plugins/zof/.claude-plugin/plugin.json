@@ -1,8 +1,8 @@
 {
   "name": "zof",
   "displayName": "Zof",
-  "version": "0.2.0",
-  "description": "Zof for coding agents: whether a pull request may ship, why it is blocked, what evidence is missing, and your test runs, from your company's Zof. Read-only; sign in with your Zof account.",
+  "version": "0.3.0",
+  "description": "Zof for coding agents: whether a pull request may ship, why it is blocked, what evidence is missing, and your test runs, from your company's Zof. Runs tests only with your yes; sign in with your Zof account.",
   "author": {
     "name": "Zof AI",
     "url": "https://zof.ai"

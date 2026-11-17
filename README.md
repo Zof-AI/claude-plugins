@@ -26,14 +26,20 @@ From a shell, the same steps are `claude plugin marketplace add Zof-AI/claude-pl
 | `/zof:ship-check` | "Can this PR ship?" Gives Zof's merge answer for the current pull request (ship, blocked, pending or unknown), with progress while it verifies. |
 | `/zof:explain-block` | "Why is my release blocked?" Gives the blocking reasons, the missing evidence and what unblocks it. |
 | `/zof:test-runs` | "Did my tests pass in Zof?" Gives the latest runs, the failing results and help fixing them. |
+| `/zof:run-tests` | "Run the tests in Zof." Lists what can run, shows the cost, and starts a run only after your yes. |
 
-Claude also uses the Zof tools on its own when your question needs them. Every tool is read-only:
+Claude also uses the Zof tools on its own when your question needs them. Every tool is read-only except the three that run tests:
 
 - `zof_check_change`: preview whether a change will ship (read-only, free; a preview, not a decision);
 - release: `zof_get_release_decision`, `zof_explain_block`, `zof_get_evidence_status`, `zof_list_decisions`,
   `zof_get_policy_requirements`, `zof_get_change_record`, `zof_replay_decision`;
 - console: `zof_list_runs`, `zof_get_run`, `zof_get_test_health`, `zof_list_schedules`, `zof_get_system_graph`,
-  `zof_get_reports`, `zof_ask_copilot`.
+  `zof_get_reports`, `zof_ask_copilot`;
+- run tests: `zof_list_available_tests` (what Zof can run), `zof_run_tests` (two steps: a preview with the commit and
+  estimated credits plus a single-use confirm token, then the run once you say yes), `zof_cancel_run`.
+
+Running tests needs the **Run tests** permission (OAuth scope `zof:run`). If you connected before it existed, run
+`/mcp`, choose `zof`, and reconnect to grant it.
 
 A `ship` answer is advice. The **Zof / Control** check on the pull request still enforces the merge.
 
