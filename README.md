@@ -45,11 +45,11 @@ with Zof before a push. None of them blocks anything or makes network calls.
 through. Run inside your repository (it respects `core.hooksPath`; the URL is pinned to a reviewed commit):
 
 ```
-curl -fsSL https://raw.githubusercontent.com/Zof-AI/claude-plugins/ccf47de93b3e4c59beae9510bd499cfdd9a52e5d/integrations/git/install-git-hook.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Zof-AI/claude-plugins/e4c48d45941195bf5e82ce4e7971427cc36cdd2f/integrations/git/install-git-hook.sh | sh
 ```
 
 It only installs where no `pre-push` hook exists. If you already have one, or use husky, lefthook or pre-commit, it
-changes nothing and prints one line to add to your own hook or config. Add `sh -s -- --uninstall` to remove it, and
+changes nothing and prints one line to add near the top of your own hook or config. Add `sh -s -- --uninstall` to remove it, and
 set `ZOF_PUSH_CHECK=off` to silence it.
 
 **Cursor.** Copy `integrations/cursor/rules/zof.mdc` to `.cursor/rules/zof.mdc` in your repository. Before a push or a
