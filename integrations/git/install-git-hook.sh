@@ -4,9 +4,10 @@
 set -eu
 
 marker='# zof-push-check v1 (managed)'
-# Hooks run at the top level, so the common git dir resolves there; a missing script is skipped, never a failure.
+# Hooks run at the top level, so the common git dir resolves there. The line keeps the incoming exit status, so even
+# appended after a failing command it never turns a blocked push into a pass; a missing script is skipped.
 # shellcheck disable=SC2016 # expanded later, inside the user's hook
-call_line='f="$(git rev-parse --git-common-dir)/zof/push-reminder.sh"; [ ! -f "$f" ] || sh "$f"'
+call_line='zof_rc=$?; f="$(git rev-parse --git-common-dir)/zof/push-reminder.sh"; [ ! -f "$f" ] || sh "$f"; (exit "$zof_rc")'
 
 usage() {
   printf 'Usage: install-git-hook.sh [--uninstall]\n'
@@ -81,7 +82,7 @@ refuse() {
 
 hooks_path=$(git config --get core.hooksPath 2>/dev/null || :)
 case "$hooks_path" in
-  *.husky*) refuse "husky manages this repository's hooks." "Add this line to .husky/pre-push:" "$call_line" ;;
+  *.husky*) refuse "husky manages this repository's hooks." "Add this line near the top of .husky/pre-push:" "$call_line" ;;
 esac
 for f in lefthook.yml lefthook.yaml .lefthook.yml .lefthook.yaml lefthook.json lefthook.toml \
   .config/lefthook.yml .config/lefthook.yaml; do
@@ -97,7 +98,7 @@ if [ -f .pre-commit-config.yaml ]; then
     "- {repo: local, hooks: [{id: zof-push-check, name: Zof push reminder, language: system, entry: ${q}sh -c ${q}${q}${call_line}${q}${q}${q}, stages: [pre-push], pass_filenames: false, always_run: true, verbose: true}]}"
 fi
 if { [ -e "$hook" ] || [ -L "$hook" ]; } && ! is_ours "$hook"; then
-  refuse "$hook already exists." "Add this line to it:" "$call_line"
+  refuse "$hook already exists." "Add this line near the top of it:" "$call_line"
 fi
 
 mkdir -p "$dir"

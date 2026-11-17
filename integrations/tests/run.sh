@@ -76,6 +76,17 @@ check "foreign hook: install refused with exit 1" '[ "$rc" -eq 1 ]'
 check "foreign hook: left byte-for-byte untouched, nothing renamed" '[ "$(sum "$h")" = "$before" ] && [ "$(extras "$r/.git/hooks")" -eq 0 ]'
 line=$(printf '%s\n' "$err" | printed_line)
 check "foreign hook: prints a line to add" 'printf "%s" "$line" | grep -q "push-reminder.sh"'
+# Appended LAST in a hook without set -e, after a failing command: the push must still be blocked.
+r2=$(new_repo foreign-append)
+h2="$r2/.git/hooks/pre-push"
+printf '#!/bin/sh\necho checks-failed >&2\nfalse\n' >"$h2"
+chmod +x "$h2"
+err=$(cd "$r2" && sh "$installer" 2>&1 >/dev/null)
+printf '%s' "$err" | grep -q "near the top" && near=1 || near=0
+check "foreign hook: hint says near the top" '[ "$near" -eq 1 ]'
+printf '%s\n' "$(printf '%s\n' "$err" | printed_line)" >>"$h2"
+out=$(cd "$r2" && git push origin HEAD:refs/heads/main 2>&1); rc=$?
+check "line appended last after a failure: reminder shown, push still blocked" '[ "$rc" -ne 0 ] && printf "%s" "$out" | grep -q zof_check_change && printf "%s" "$out" | grep -q checks-failed'
 (cd "$r" && sh "$installer" --uninstall >/dev/null 2>&1)
 check "foreign hook: uninstall leaves it alone" '[ "$(sum "$h")" = "$before" ]'
 
