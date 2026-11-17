@@ -21,7 +21,8 @@ Start a Zof test run for this repository. A run uses credits, so it never starts
 6. **Run:** only after the user says yes, call `zof_run_tests` again with the same arguments and the `confirm_token`
    from the preview. If the user changes the tests or the commit, preview again for a new token.
 7. **Watch:** share the run id and the console link. Call `zof_get_run` with the `run_id`, and call it again after
-   `check_again_in_s` seconds while the run is going. Keep other work moving between calls.
+   `check_again_in_s` seconds while the run is going. Keep other work moving between calls. Stop checking once the
+   run has finished (passed, failed, cancelled or couldn't run).
 8. **Report:** say plainly what passed and failed. For failures, give the `reason` and `analysis`, and offer a fix
    (see `/zof:test-runs`).
 

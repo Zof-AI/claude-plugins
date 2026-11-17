@@ -30,6 +30,7 @@ From a shell, the same steps are `claude plugin marketplace add Zof-AI/claude-pl
 
 Claude also uses the Zof tools on its own when your question needs them. Every tool is read-only except the three that run tests:
 
+- `zof_check_change`: preview whether a change will ship (read-only, free; a preview, not a decision);
 - release: `zof_get_release_decision`, `zof_explain_block`, `zof_get_evidence_status`, `zof_list_decisions`,
   `zof_get_policy_requirements`, `zof_get_change_record`, `zof_replay_decision`;
 - console: `zof_list_runs`, `zof_get_run`, `zof_get_test_health`, `zof_list_schedules`, `zof_get_system_graph`,
@@ -41,6 +42,30 @@ Running tests needs the **Run tests** permission (OAuth scope `zof:run`). If you
 `/mcp`, choose `zof`, and reconnect to grant it.
 
 A `ship` answer is advice. The **Zof / Control** check on the pull request still enforces the merge.
+
+## Use Zof with any coding agent
+
+The Zof MCP server works in any agent that speaks MCP. These remind the agent, or the person at the terminal, to check
+with Zof before a push. None of them blocks anything or makes network calls.
+
+**Git (any tool, any person).** A `pre-push` hook prints a short reminder on every `git push` and always lets it
+through. Run inside your repository (it respects `core.hooksPath`; the URL is pinned to a reviewed commit):
+
+```
+curl -fsSL https://raw.githubusercontent.com/Zof-AI/claude-plugins/e4c48d45941195bf5e82ce4e7971427cc36cdd2f/integrations/git/install-git-hook.sh | sh
+```
+
+It only installs where no `pre-push` hook exists. If you already have one, or use husky, lefthook or pre-commit, it
+changes nothing and prints one line to add near the top of your own hook or config. Add `sh -s -- --uninstall` to remove it, and
+set `ZOF_PUSH_CHECK=off` to silence it.
+
+**Cursor.** Copy `integrations/cursor/rules/zof.mdc` to `.cursor/rules/zof.mdc` in your repository. Before a push or a
+pull request, the agent asks Zof (`zof_check_change`) and tells you what is required or missing. Cursor also reads
+`AGENTS.md`, so the next item works there too.
+
+**Codex and other agents that read `AGENTS.md`.** Paste `integrations/codex/AGENTS.md` into your repository's
+`AGENTS.md`. It tells the agent to ask Zof (`zof_check_change`) before a push or a pull request and to report what is
+required or missing.
 
 ## Server address
 

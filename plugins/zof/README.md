@@ -14,3 +14,8 @@ Install in Claude Code:
 
 Skills: `/zof:ship-check`, `/zof:explain-block`, `/zof:test-runs`, `/zof:run-tests`. Set `ZOF_MCP_URL` to use another server address.
 Install steps, the tool list and help links are in the marketplace README: https://github.com/Zof-AI/claude-plugins.
+
+Push check: a warn-only `PreToolUse` hook runs on `git push`, `gh pr create` and `gh pr merge`. It adds a reminder
+asking Claude to check `zof_check_change` (or `zof_get_release_decision`) first and tell you what Zof requires. It never
+blocks a command and makes no network calls. Turn it off with `export ZOF_PUSH_CHECK=off`. Test it with
+`sh plugins/zof/tests/pre-push-check.test.sh`.
