@@ -26,6 +26,6 @@ Report what Zof's test runs say about this repository, and turn a failure into a
 ## Notes
 
 - `zof_list_schedules` shows when the next scheduled run is, if the user asks.
-- These tools read Zof and change nothing. To start a new run, the user does it in the Zof console or by pushing.
+- These tools read Zof and change nothing. To start a new run, use `/zof:run-tests`.
 - On a tool error (`isError: true`), report `code` and `detail`. After a 401, ask the user to run `/mcp`, choose `zof`
   and Authenticate.
